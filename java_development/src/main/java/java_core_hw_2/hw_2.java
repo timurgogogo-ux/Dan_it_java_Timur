@@ -2,8 +2,8 @@ package java_core_hw_2;
 
 public class hw_2 {
     public static void main(String[] args) {
-        System.out.println("gryffindor");
-        System.out.println("slithering");
+        System.out.println("Hryffindor");
+        System.out.println("Slithering");
         System.out.println("Hafelpuff");
         System.out.println("Ravenclaw");
         int gryffindor = 482;
