@@ -3,7 +3,7 @@ package java_core_hw_1;
 import java.util.Random;
 import java.util.Scanner;
 
-public class java_core_hw_1 {
+public class gitjava_core_hw_1 {
     public static void main(String[] args) {
                 Scanner scanner = new Scanner(System.in);
                 Random random = new Random();
