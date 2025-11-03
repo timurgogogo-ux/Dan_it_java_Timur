@@ -18,7 +18,6 @@ public class Human {
             this.surname = surname;
             this.year = year;
         }
-
         public Human(String name, String surname, int year, int iq, String[][] schedule, Family family) {
             this.name = name;
             this.surname = surname;
