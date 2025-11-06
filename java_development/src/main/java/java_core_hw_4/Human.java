@@ -1,4 +1,4 @@
-package java_core_home_work_4_new;
+package java_core_hw_4;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -9,7 +9,7 @@ public class Human {
     private int year;
     private int iq;
     private String[][] schedule;
-    private Family family; // посилання на родину
+    private Family family;
 
     public Human() {}
 

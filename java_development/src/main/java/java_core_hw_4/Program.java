@@ -1,8 +1,8 @@
-package java_core_home_work_4_new;
+package java_core_hw_4;
 
 
 
-public class Programs {
+public class Program {
     public static void main(String[] args) {
         String[] habits = {"eat", "drink", "sleep"};
         Pet dog = new Pet("dog", "Rock", 5, 75, habits);

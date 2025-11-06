@@ -1,4 +1,4 @@
-package java_core_home_work_4_new;
+package java_core_hw_4;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -17,7 +17,6 @@ public class Family {
         father.setFamily(this);
     }
 
-    // Методи
     public void addChild(Human child) {
         Human[] newChildren = Arrays.copyOf(children, children.length + 1);
         newChildren[children.length] = child;
@@ -38,10 +37,9 @@ public class Family {
     }
 
     public int countFamily() {
-        return 2 + children.length + (pet != null ? 1 : 0);
+        return 2 + children.length ;
     }
 
-    // Гетери/сетери
     public Human getMother() { return mother; }
     public void setMother(Human mother) { this.mother = mother; }
 

@@ -1,4 +1,4 @@
-package java_core_home_work_4_new;
+package java_core_hw_4;
 
 import java.util.Arrays;
 import java.util.Objects;
