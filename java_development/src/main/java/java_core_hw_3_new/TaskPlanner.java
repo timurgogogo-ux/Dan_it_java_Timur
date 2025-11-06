@@ -48,7 +48,6 @@ public class TaskPlanner {
         scanner.close();
     }
 
-    // ⬇️ Масив переміщено в окремий метод нижче
     public static String[][] createSchedule() {
         String[][] schedule = new String[7][2];
         schedule[0][0] = "Sunday";    schedule[0][1] = "do home work";
