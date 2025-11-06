@@ -10,13 +10,13 @@ public class TaskPlanner {
 
         while (true) {
             System.out.print("Please, input the day of the week: ");
-            String input = scanner.nextLine().trim().toLowerCase();
+            String dayOfWeek = scanner.nextLine().trim().toLowerCase();
 
-            if (input.equals("exit")) {
+            if (dayOfWeek.equals("exit")) {
                 break;
             }
 
-            switch (input) {
+            switch (dayOfWeek) {
                 case "sunday":
                     System.out.println("Your tasks for Sunday: " + schedule[0][1] + ".");
                     break;
