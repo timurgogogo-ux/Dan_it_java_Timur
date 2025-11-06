@@ -1,9 +1,9 @@
-package java_core_home_work_2_new;
+package java_core_hw_2_new;
 
 import java.util.Random;
 import java.util.Scanner;
 
-public class target_shooting {
+public class TargetShooting {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
@@ -24,8 +24,8 @@ public class target_shooting {
         System.out.println();
 
         while (true) {
-            int row = 0;
-            int col = 0;
+            int row;
+            int col;
 
             while (true) {
                 System.out.print("Enter line (1-5): ");
