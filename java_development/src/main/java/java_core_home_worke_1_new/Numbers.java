@@ -13,12 +13,21 @@ public class Numbers {
         String name = scanner.nextLine();
 
         int secretNumber = random.nextInt(101);
-        int[] guesses = new int[100];
+        int[] guesses = new int[1];
         int attemptCount = 0;
 
         while (true) {
-            System.out.print("Enter your guess (0-100): ");
+            System.out.print("Enter your guess (0–100): ");
             int guess = scanner.nextInt();
+
+            if (attemptCount == guesses.length) {
+                int[] newGuesses = new int[guesses.length + 1];
+                for (int i = 0; i < guesses.length; i++) {
+                    newGuesses[i] = guesses[i];
+                }
+                guesses = newGuesses;
+            }
+
             guesses[attemptCount] = guess;
             attemptCount++;
 
@@ -30,14 +39,14 @@ public class Numbers {
                 System.out.println("Congratulations, " + name + "!");
                 System.out.print("Your guesses: ");
 
-                for (int i = attemptCount - 1; i >= 0; i--) {
+                for (int i = 0; i < attemptCount; i++) {
                     System.out.print(guesses[i] + " ");
                 }
 
+                System.out.println("\nYou guessed it in " + attemptCount + " attempts!");
                 break;
             }
         }
         scanner.close();
     }
 }
-
