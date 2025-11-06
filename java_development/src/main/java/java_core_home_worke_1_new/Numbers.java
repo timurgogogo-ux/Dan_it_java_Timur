@@ -33,7 +33,7 @@ public class Numbers {
                 for (int i = attemptCount - 1; i >= 0; i--) {
                     System.out.print(guesses[i] + " ");
                 }
-                System.out.println();
+
                 break;
             }
         }
