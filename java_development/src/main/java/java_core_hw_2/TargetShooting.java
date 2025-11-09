@@ -1,4 +1,4 @@
-package java_core_hw_2_new;
+package java_core_hw_2;
 
 import java.util.Random;
 import java.util.Scanner;
