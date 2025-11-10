@@ -1,7 +1,8 @@
 package Home_work_5;
 
-import java.util.Objects;
 import java.util.Arrays;
+import java.util.Objects;
+
 public class Family {
     private Human mother;
     private Human father;
@@ -12,12 +13,12 @@ public class Family {
         this.mother = mother;
         this.father = father;
         this.children = new Human[0];
-        mother.setFamily(this);
-        father.setFamily(this);
+        if (mother != null) mother.setFamily(this);
+        if (father != null) father.setFamily(this);
     }
 
-
     public void addChild(Human child) {
+        if (child == null) return;
         Human[] newChildren = Arrays.copyOf(children, children.length + 1);
         newChildren[children.length] = child;
         children = newChildren;
@@ -37,31 +38,37 @@ public class Family {
     }
 
     public boolean deleteChild(Human child) {
-        if (children.length == 0) return false;
-        int indexToRemove = -1;
+        if (child == null) return false;
         for (int i = 0; i < children.length; i++) {
             if (children[i].equals(child)) {
-                indexToRemove = i;
-                break;
+                return deleteChild(i);
             }
         }
-        if (indexToRemove == -1) return false;
-        return deleteChild(indexToRemove);
+        return false;
     }
 
     public int countFamily() {
-        return 2 + children.length + (pet != null ? 1 : 0);
+        // count only humans: mother + father + children
+        return 2 + children.length;
     }
 
-
     public Human getMother() { return mother; }
-    public void setMother(Human mother) { this.mother = mother; }
+    public void setMother(Human mother) {
+        this.mother = mother;
+        if (mother != null) mother.setFamily(this);
+    }
 
     public Human getFather() { return father; }
-    public void setFather(Human father) { this.father = father; }
+    public void setFather(Human father) {
+        this.father = father;
+        if (father != null) father.setFamily(this);
+    }
 
     public Human[] getChildren() { return children; }
-    public void setChildren(Human[] children) { this.children = children; }
+    public void setChildren(Human[] children) {
+        this.children = children == null ? new Human[0] : children;
+        for (Human c : this.children) if (c != null) c.setFamily(this);
+    }
 
     public Pet getPet() { return pet; }
     public void setPet(Pet pet) { this.pet = pet; }
@@ -69,10 +76,10 @@ public class Family {
     @Override
     public String toString() {
         return "Family{" +
-                "mother=" + mother.getName() + " " + mother.getSurname() +
-                ", father=" + father.getName() + " " + father.getSurname() +
+                "mother=" + (mother != null ? mother.getName() + " " + mother.getSurname() : "null") +
+                ", father=" + (father != null ? father.getName() + " " + father.getSurname() : "null") +
                 ", children=" + Arrays.toString(children) +
-                ", pet=" + pet +
+                ", pet=" + (pet != null ? pet.toString() : "null") +
                 '}';
     }
 
@@ -90,10 +97,13 @@ public class Family {
         return Objects.hash(mother, father);
     }
 
-
     @Override
     protected void finalize() throws Throwable {
-        System.out.println("Family object is being deleted: " + mother.getSurname() + " family");
+        try {
+            System.out.println("Finalizing Family: " + this);
+        } finally {
+            super.finalize();
+        }
     }
 }
 

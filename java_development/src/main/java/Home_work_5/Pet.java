@@ -10,7 +10,6 @@ public class Pet {
     private int trickLevel;
     private String[] habits;
 
-
     public Pet() {}
 
     public Pet(Species species, String nickname) {
@@ -26,19 +25,17 @@ public class Pet {
         this.habits = habits;
     }
 
-
     public void eat() {
         System.out.println("I eat!");
     }
 
     public void respond() {
-        System.out.println("Hello, host. I - " + nickname + ". I was bored!");
+        System.out.printf("Hello, guest. I am %s the %s.%n", nickname, species);
     }
 
     public void foul() {
-        System.out.println("You need to cover your tracks well...");
+        System.out.println("Need to cover your tracks well...");
     }
-
 
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
@@ -67,7 +64,7 @@ public class Pet {
         if (!(o instanceof Pet)) return false;
         Pet pet = (Pet) o;
         return age == pet.age && trickLevel == pet.trickLevel &&
-                species == pet.species &&
+                Objects.equals(species, pet.species) &&
                 Objects.equals(nickname, pet.nickname);
     }
 
@@ -76,10 +73,13 @@ public class Pet {
         return Objects.hash(species, nickname, age, trickLevel);
     }
 
-
     @Override
     protected void finalize() throws Throwable {
-        System.out.println("Pet object is being deleted: " + this.nickname);
+        try {
+            System.out.println("Finalizing Pet: " + this);
+        } finally {
+            super.finalize();
+        }
     }
 }
 

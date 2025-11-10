@@ -1,15 +1,15 @@
 package Home_work_5;
 
-import java.util.Objects;
 import java.util.Arrays;
+import java.util.Objects;
+
 public class Human {
     private String name;
     private String surname;
     private int year;
     private int iq;
     private String[][] schedule;
-    private Family family; // посилання на родину
-
+    private Family family;
 
     public Human() {}
 
@@ -28,26 +28,24 @@ public class Human {
         this.family = family;
     }
 
-
     public void greetPet() {
         if (family != null && family.getPet() != null) {
-            System.out.println("Привіт, " + family.getPet().getNickname());
+            System.out.println("Hello, " + family.getPet().getNickname());
         } else {
-            System.out.println("У мене немає улюбленця.");
+            System.out.println("I don't have a pet.");
         }
     }
 
     public void describePet() {
         if (family != null && family.getPet() != null) {
             Pet pet = family.getPet();
-            String trickDesc = pet.getTrickLevel() > 50 ? "дуже хитрий" : "майже не хитрий";
-            System.out.printf("У мене є %s, йому %d років, він %s.%n",
+            String trickDesc = pet.getTrickLevel() > 50 ? "very cunning" : "almost not cunning";
+            System.out.printf("I have %s, he is %d years old, he is %s.%n",
                     pet.getSpecies(), pet.getAge(), trickDesc);
         } else {
-            System.out.println("Немає домашнього улюбленця.");
+            System.out.println("No pets.");
         }
     }
-
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -89,10 +87,13 @@ public class Human {
         return Objects.hash(name, surname, year);
     }
 
-
     @Override
     protected void finalize() throws Throwable {
-        System.out.println("Human object is being deleted: " + name + " " + surname);
+        try {
+            System.out.println("Finalizing Human: " + this);
+        } finally {
+            super.finalize();
+        }
     }
 }
 
