@@ -25,7 +25,6 @@ public class Program {
         DomesticCat cat = new DomesticCat("Murka", 3, 60, new HashSet<>(Arrays.asList("sleep")));
         family.setPets(new HashSet<>(Arrays.asList(dog, cat)));
 
-        // Усиновлена дитина — дата у форматі dd/MM/yyyy
         Human adopted = new Human("Mike", "Smith", "20/03/2016", 80);
         family.addChild(adopted);
 

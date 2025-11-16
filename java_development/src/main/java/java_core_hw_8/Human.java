@@ -15,7 +15,6 @@ public class Human {
     private Map<String, String> schedule;
     private Family family;
 
-    // --- КОНСТРУКТОР ДЛЯ ЗВИЧАЙНИХ ДІТЕЙ/ДОРОСЛИХ ---
     public Human(String name, String surname, long birthDate, int iq) {
         this.name = name;
         this.surname = surname;
@@ -23,7 +22,7 @@ public class Human {
         this.iq = iq;
     }
 
-    // --- КОНСТРУКТОР ДЛЯ УСИНОВЛЕНИХ ДІТЕЙ ---
+
     public Human(String name, String surname, String birthDateString, int iq) {
         this.name = name;
         this.surname = surname;
@@ -48,7 +47,7 @@ public class Human {
                 p.getYears(), p.getMonths(), p.getDays());
     }
 
-    // --- ГЕТТЕР ДАТИ ДЛЯ toString() ---
+
     private String getBirthDateFormatted() {
         return Instant.ofEpochMilli(birthDate)
                 .atZone(ZoneId.systemDefault())
