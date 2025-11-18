@@ -1,8 +1,14 @@
 package java_core_home_work_9;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
+import java_core_home_work_9.Family;
+import java_core_home_work_9.Human;
+import java_core_home_work_9.Pet;
+import java_core_home_work_9.FamilyDao;
 
 public class FamilyService {
 
@@ -17,27 +23,33 @@ public class FamilyService {
     }
 
     public void displayAllFamilies() {
-        List<Family> families = getAllFamilies();
-        for (int i = 0; i < families.size(); i++) {
-            System.out.println(i + ": " + families.get(i));
+        List<Family> list = familyDao.getAllFamilies();
+        for (int i = 0; i < list.size(); i++) {
+            System.out.printf("[%d] %s%n", i, familyToString(list.get(i)));
         }
     }
 
     public List<Family> getFamiliesBiggerThan(int memberCount) {
-        return familyDao.getAllFamilies().stream()
-                .filter(f -> f.countFamily() > memberCount)
-                .collect(Collectors.toList());
+        List<Family> res = new ArrayList<>();
+        for (Family f : familyDao.getAllFamilies()) {
+            if (f.countFamily() > memberCount) res.add(f);
+        }
+        res.forEach(f -> System.out.println(familyToString(f)));
+        return res;
     }
 
     public List<Family> getFamiliesLessThan(int memberCount) {
-        return familyDao.getAllFamilies().stream()
-                .filter(f -> f.countFamily() < memberCount)
-                .collect(Collectors.toList());
+        List<Family> res = new ArrayList<>();
+        for (Family f : familyDao.getAllFamilies()) {
+            if (f.countFamily() < memberCount) res.add(f);
+        }
+        res.forEach(f -> System.out.println(familyToString(f)));
+        return res;
     }
 
-    public long countFamiliesWithMemberNumber(int memberCount) {
+    public long countFamiliesWithMemberNumber(int number) {
         return familyDao.getAllFamilies().stream()
-                .filter(f -> f.countFamily() == memberCount)
+                .filter(f -> f.countFamily() == number)
                 .count();
     }
 
@@ -54,24 +66,16 @@ public class FamilyService {
     public Family bornChild(Family family, String maleName, String femaleName) {
         if (family == null) return null;
 
-        boolean isMale = Math.random() < 0.5;
+        boolean isMale = ThreadLocalRandom.current().nextBoolean();
         String childName = isMale ? maleName : femaleName;
+        String surname = family.getFather() != null ? family.getFather().getSurname() :
+                (family.getMother() != null ? family.getMother().getSurname() : "Unknown");
 
-        // Surname from father if present, otherwise mother
-        String surname = family.getFather() != null ? family.getFather().getSurname()
-                : (family.getMother() != null ? family.getMother().getSurname() : "Unknown");
+        long birthMillis = Instant.now().toEpochMilli();
+        int iq = averageIq(family.getMother(), family.getFather());
 
-        // birthDate = now (start of day)
-        long birthMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-        // IQ average of parents (if one missing, use other or default 0)
-        int iqFather = family.getFather() != null ? family.getFather().getIq() : 0;
-        int iqMother = family.getMother() != null ? family.getMother().getIq() : 0;
-        int childIq = (iqFather + iqMother) / ( (family.getFather()!=null && family.getMother()!=null) ? 2 : (family.getFather()!=null || family.getMother()!=null ? 1 : 1));
-
-        Human child = new Human(childName, surname, birthMillis, childIq);
+        Human child = new Human(childName, surname, birthMillis, iq);
         family.addChild(child);
-
         familyDao.saveFamily(family);
         return family;
     }
@@ -84,23 +88,15 @@ public class FamilyService {
     }
 
     public void deleteAllChildrenOlderThen(int age) {
-        LocalDate now = LocalDate.now();
-        List<Family> families = familyDao.getAllFamilies();
-
-        for (Family f : families) {
+        if (age < 0) return;
+        long now = System.currentTimeMillis();
+        for (Family f : new ArrayList<>(familyDao.getAllFamilies())) {
             List<Human> toRemove = new ArrayList<>();
-            for (Human c : f.getChildren()) {
-                long millis = c.getBirthDate();
-                LocalDate birth = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate();
-                int years = Period.between(birth, now).getYears();
-                if (years > age) {
-                    toRemove.add(c);
-                }
+            for (Human child : f.getChildren()) {
+                int childAge = calculateAgeYears(child.getBirthDate(), now);
+                if (childAge > age) toRemove.add(child);
             }
-            // remove collected
-            for (Human r : toRemove) {
-                f.deleteChild(r);
-            }
+            toRemove.forEach(f::deleteChild);
             familyDao.saveFamily(f);
         }
     }
@@ -119,13 +115,39 @@ public class FamilyService {
         return f.getPets();
     }
 
-    public boolean addPet(int familyIndex, Pet pet) {
+    public void addPet(int familyIndex, Pet pet) {
         Family f = familyDao.getFamilyByIndex(familyIndex);
-        if (f == null) return false;
+        if (f == null) return;
         Set<Pet> pets = f.getPets();
+        if (pets == null) {
+            pets = new HashSet<>();
+            f.setPets(pets);
+        }
         pets.add(pet);
-        f.setPets(pets);
         familyDao.saveFamily(f);
-        return true;
+    }
+
+    // --- допоміжні методи ---
+    private int averageIq(Human m, Human f) {
+        int miq = (m != null) ? m.getIq() : 0;
+        int fiq = (f != null) ? f.getIq() : 0;
+        if (miq == 0 && fiq == 0) return 0;
+        return (miq + fiq) / ( (miq>0 && fiq>0) ? 2 : 1 );
+    }
+
+    private int calculateAgeYears(long birthMillis, long nowMillis) {
+        LocalDate birth = Instant.ofEpochMilli(birthMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate now = Instant.ofEpochMilli(nowMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+        return java.time.Period.between(birth, now).getYears();
+    }
+
+    private String familyToString(Family f) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Family{mother=").append(f.getMother() != null ? f.getMother().getName()+" "+f.getMother().getSurname() : "null");
+        sb.append(", father=").append(f.getFather() != null ? f.getFather().getName()+" "+f.getFather().getSurname() : "null");
+        sb.append(", children=").append(f.getChildren());
+        sb.append(", pets=").append(f.getPets());
+        sb.append("}");
+        return sb.toString();
     }
 }

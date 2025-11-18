@@ -1,93 +1,91 @@
 package java_core_home_work_9;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashSet;
-import java.util.Arrays;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java_core_hw_8.*;
+import java_core_hw_8.dao.CollectionFamilyDao;
+import java_core_hw_8.dao.FamilyDao;
 
 public class FamilyServiceTest {
 
-    private CollectionFamilyDao dao;
     private FamilyService service;
+    private FamilyDao dao;
 
     @BeforeEach
-    void setUp() {
+    public void setup() {
         dao = new CollectionFamilyDao();
         service = new FamilyService(dao);
 
-        long momBirth = LocalDate.of(1985, 3, 10).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        long dadBirth = LocalDate.of(1980, 1, 5).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long mBirth = LocalDate.of(1985, 3, 10).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long fBirth = LocalDate.of(1980, 1, 5).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        Woman mother = new Woman("Anna", "Smith", momBirth, 95);
-        Man father = new Man("John", "Smith", dadBirth, 90);
+        Woman m = new Woman("Anna", "Test", mBirth, 90);
+        Man f = new Man("John", "Test", fBirth, 90);
 
-        Family f = new Family(mother, father);
-        dao.addInitialFamily(f); // helper to populate
+        service.createNewFamily(m, f);
     }
 
     @Test
-    void testCreateNewFamily() {
-        int before = service.count();
-        Woman mom = new Woman("Kate", "Bell", "01/01/1990", 80);
-        Man dad = new Man("Tom", "Bell", "01/01/1987", 75);
-
-        service.createNewFamily(mom, dad);
-        assertEquals(before + 1, service.count());
+    public void testCreateAndCount() {
+        assertEquals(1, service.count());
+        List<Family> families = service.getAllFamilies();
+        assertNotNull(families);
+        assertEquals(1, families.size());
     }
 
     @Test
-    void testBornChildAddsChild() {
+    public void testAddPetAndGetPets() {
+        Dog dog = new Dog("Buddy", 2, 50, new HashSet<>());
+        service.addPet(0, dog);
+        assertTrue(service.getPets(0).contains(dog));
+    }
+
+    @Test
+    public void testAdoptChild() {
+        Human child = new Human("Sam", "Test", "01/01/2018", 60);
         Family f = service.getFamilyById(0);
-        assertNotNull(f);
-
-        int before = f.getChildren().size();
-        service.bornChild(f, "BoyName", "GirlName");
-        Family updated = service.getFamilyById(0);
-        assertEquals(before + 1, updated.getChildren().size());
-    }
-
-    @Test
-    void testAdoptChild() {
-        Family f = service.getFamilyById(0);
-        Human child = new Human("Adopted", "Smith", "10/10/2012", 70);
-
-        int before = f.getChildren().size();
         service.adoptChild(f, child);
-        assertEquals(before + 1, f.getChildren().size());
         assertTrue(f.getChildren().contains(child));
     }
 
     @Test
-    void testDeleteAllChildrenOlderThen() {
+    public void testBornChild() {
         Family f = service.getFamilyById(0);
-        // add two children with different birth dates
-        Human young = new Human("Young", "Smith", "01/01/2019", 50); // ~6 years or less depending on current date
-        Human old = new Human("Old", "Smith", "01/01/2000", 50); // definitely >5 years
-        f.addChild(young);
-        f.addChild(old);
-        dao.saveFamily(f);
-
-        service.deleteAllChildrenOlderThen(18); // delete older than 18
-        Family after = service.getFamilyById(0);
-
-        boolean hasOld = after.getChildren().stream().anyMatch(c -> c.getName().equals("Old"));
-        boolean hasYoung = after.getChildren().stream().anyMatch(c -> c.getName().equals("Young"));
-        assertFalse(hasOld);
-        assertTrue(hasYoung || after.getChildren().size()>=0); // young likely present
+        int before = f.getChildren().size();
+        service.bornChild(f, "Ben", "Anna");
+        assertEquals(before + 1, f.getChildren().size());
     }
 
     @Test
-    void testAddPet() {
-        Dog dog = new Dog("Buddy", 3, 40, new HashSet<>(Arrays.asList("play")));
-        boolean added = service.addPet(0, dog);
-        assertTrue(added);
-
+    public void testDeleteAllChildrenOlderThen() {
         Family f = service.getFamilyById(0);
-        assertTrue(f.getPets().stream().anyMatch(p -> p.getNickname().equals("Buddy")));
+        // create a child older than 10 years
+        Human oldChild = new Human("Old", "Test", "01/01/2000", 50);
+        service.adoptChild(f, oldChild);
+        service.deleteAllChildrenOlderThen(18);
+        assertFalse(f.getChildren().contains(oldChild));
+    }
+
+    @Test
+    public void testGetFamiliesBiggerLessThanCount() {
+        // After setup there's 1 family and maybe no children/pets.
+        assertEquals(0, service.getFamiliesBiggerThan(3).size());
+        assertTrue(service.getFamiliesLessThan(5).size() >= 1);
+        // count families with member number 2 (just parents)
+        assertTrue(service.countFamiliesWithMemberNumber(2) >= 1);
+    }
+
+    @Test
+    public void testDeleteFamilyByIndex() {
+        assertTrue(service.deleteFamilyByIndex(0));
+        assertEquals(0, service.count());
     }
 }
