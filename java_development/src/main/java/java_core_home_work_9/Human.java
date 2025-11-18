@@ -17,7 +17,7 @@ public class Human {
     private Map<String, String> schedule;
     private Family family;
 
-    // Конструктор зі значенням birthDate у мілісекундах
+
     public Human(String name, String surname, long birthDate, int iq) {
         this.name = name;
         this.surname = surname;
@@ -25,7 +25,7 @@ public class Human {
         this.iq = iq;
     }
 
-    // Конструктор для усиновлених / коли дата передається рядком dd/MM/yyyy
+
     public Human(String name, String surname, String birthDateString, int iq) {
         this.name = name;
         this.surname = surname;

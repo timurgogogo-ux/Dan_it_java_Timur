@@ -127,7 +127,7 @@ public class FamilyService {
         familyDao.saveFamily(f);
     }
 
-    // --- допоміжні методи ---
+
     private int averageIq(Human m, Human f) {
         int miq = (m != null) ? m.getIq() : 0;
         int fiq = (f != null) ? f.getIq() : 0;
