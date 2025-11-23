@@ -1,0 +1,13 @@
+package java_core_home_work_11;
+
+import java.util.List;
+
+public interface FamilyDao {
+    List<Family> getAllFamilies();
+    Family getFamilyByIndex(int index);
+    boolean deleteFamily(int index);
+    boolean deleteFamily(Family family);
+    void saveFamily(Family family);
+    // replace DAO internal list with provided list
+    void loadData(List<Family> families);
+}
